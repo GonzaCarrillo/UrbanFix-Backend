@@ -1,1 +1,8 @@
-node_modules/
+
+# Ignorar dependencias y variables de entorno
+
+backend/node_modules/
+.env
+backend/.env
+documentacion
+UrbanFix-Solutions-Brief.pdf
