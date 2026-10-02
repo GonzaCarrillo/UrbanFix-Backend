@@ -93,6 +93,17 @@ El modelo de datos y las relaciones principales del sistema (Usuarios, Servicios
 Consulta la carpeta /documentacion para ver el diagrama de clases completo (Diagrama_de_Clases_UrbanFix).
 
 Desarrollado para el proyecto final de Talently Lab.
+IMPLEMENTACION DE MODELO POR CAPAS
+Descripción de las Capas:
+Rutas (Routes): Definen los endpoints de la API (el "Contrato de API"). Reciben la petición HTTP y la derivan al controlador correspondiente.
+
+Controladores (Controllers): Reciben la petición, extraen y validan los parámetros/body, y llaman al servicio. Finalmente, estructuran la respuesta JSON (éxito o error) que se enviará al cliente.
+
+Servicios (Services): Contienen toda la lógica de negocio. Aquí se procesan los datos, se aplican reglas de la aplicación y se coordina qué datos guardar o buscar.
+
+Prisma ORM: Actúa como la capa de acceso a datos. Traduce las instrucciones de JavaScript/TypeScript a consultas SQL seguras.
+
+PostgreSQL: La base de datos relacional donde persiste toda la información del sistema
 ```mermaid
 graph LR
     subgraph Frontend
