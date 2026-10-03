@@ -2,7 +2,7 @@ datasource db {
   provider = "postgresql"
  
 }
-
+/*Cada vez que cambies schema.prisma: npx prisma migrate dev --name descripcion_del_cambio, y luego npx prisma generate.*/
 generator client {
   provider = "prisma-client-js"
 }
