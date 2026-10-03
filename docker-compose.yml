@@ -1,0 +1,36 @@
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: urbanfix-db
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: urbanfix
+      POSTGRES_PASSWORD: urbanfix_pass
+      POSTGRES_DB: urbanfix_db
+    ports:
+      - "5434:5432"   # 5433 en tu PC para no chocar con un Postgres local
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U urbanfix -d urbanfix_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  api:
+    build: ./backend
+    container_name: urbanfix-api
+    restart: unless-stopped
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      DATABASE_URL: postgresql://urbanfix:urbanfix_pass@db:5432/urbanfix_db
+      JWT_SECRET: ${JWT_SECRET}
+      JWT_EXPIRES_IN: 7d
+      PORT: 3001
+    ports:
+      - "3001:3001"
+
+volumes:
+  pgdata:
