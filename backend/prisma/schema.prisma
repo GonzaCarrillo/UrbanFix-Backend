@@ -1,6 +1,5 @@
 datasource db {
   provider = "postgresql"
- 
 }
 
 generator client {
@@ -14,43 +13,84 @@ enum Rol {
 }
 
 enum EstadoSolicitud {
-  PENDIENTE   // Creada por el cliente, esperando asignación/respuesta
-  ACEPTADA    // Técnico aceptó el trabajo
-  RECHAZADA   // Técnico rechazó el trabajo
-  EN_PROCESO  // Trabajo en ejecución
-  FINALIZADA  // Trabajo completado
-  CANCELADA   // Cancelada por el cliente o admin
+  PENDIENTE // Creada por el cliente, esperando asignación/respuesta
+  ACEPTADA // Técnico aceptó el trabajo
+  RECHAZADA // Técnico rechazó el trabajo
+  EN_PROCESO // Trabajo en ejecución
+  FINALIZADA // Trabajo completado
+  CANCELADA // Cancelada por el cliente o admin
 }
 
 model Usuario {
-  id                 String    @id @default(uuid())
-  email              String    @unique
+  id                 String   @id @default(uuid())
+  email              String   @unique
   passwordHash       String
   nombre             String
-  celular            String?   // opcional
-  rol                Rol       @default(CLIENTE)
-  fechaCreacion      DateTime  @default(now())
-  fechaActualizacion DateTime  @updatedAt
+  celular            String? // opcional
+  rol                Rol      @default(CLIENTE)
+  fechaCreacion      DateTime @default(now())
+  fechaActualizacion DateTime @updatedAt
 
   // Relaciones
-  solicitudesComoCliente SolicitudServicio[] @relation("SolicitudesComoCliente")
-  solicitudesComoTecnico SolicitudServicio[] @relation("SolicitudesComoTecnico")
+  solicitudesComoCliente SolicitudServicio[]        @relation("SolicitudesComoCliente")
+  solicitudesComoTecnico SolicitudServicio[]        @relation("SolicitudesComoTecnico")
+  cambiosDeEstado        HistorialEstadoSolicitud[] @relation("CambiosDeEstado")
+}
+
+enum CategoriaServicio {
+  PLOMERIA
+  CARPINTERIA
+  PINTURA
+  CERRAJERIA
+  ALBANILERIA
+  OTRO
+}
+
+model HistorialEstadoSolicitud {
+  id String @id @default(uuid())
+
+  solicitudId String
+  solicitud   SolicitudServicio @relation(fields: [solicitudId], references: [id], onDelete: Cascade)
+
+  estadoAnterior EstadoSolicitud? // null en el primer registro
+  estadoNuevo    EstadoSolicitud
+
+  cambiadoPorId String
+  cambiadoPor   Usuario @relation("CambiosDeEstado", fields: [cambiadoPorId], references: [id])
+
+  motivo      String? // útil para rechazos y cancelaciones
+  fechaCambio DateTime @default(now())
+
+  @@index([solicitudId])
 }
 
 model SolicitudServicio {
-  id                 String          @id @default(uuid())
-  titulo             String
-  descripcion        String
-  categoria          String          // Ej: Plomería, Electricidad, Gas
-  direccion          String
-  estado             EstadoSolicitud @default(PENDIENTE)
+  id          String          @id @default(uuid())
+  titulo      String
+  descripcion String
+  categoria   String // Ej: Plomería, Electricidad, Gas
+  direccion   String
+  estado      EstadoSolicitud @default(PENDIENTE)
 
-  clienteId          String
-  cliente            Usuario         @relation("SolicitudesComoCliente", fields: [clienteId], references: [id])
+  clienteId String
+  cliente   Usuario @relation("SolicitudesComoCliente", fields: [clienteId], references: [id])
 
-  tecnicoId          String?
-  tecnico            Usuario?        @relation("SolicitudesComoTecnico", fields: [tecnicoId], references: [id])
+  tecnicoId String? //null hasta que un tecnico acepta
+  tecnico   Usuario? @relation("SolicitudesComoTecnico", fields: [tecnicoId], references: [id])
 
-  fechaCreacion      DateTime        @default(now())
-  fechaActualizacion DateTime        @updatedAt
+  // Timestamps del ciclo de vida
+  fechaCreacion      DateTime  @default(now())
+  fechaAceptacion    DateTime? // técnico acepta
+  fechaInicio        DateTime? // técnico arranca el trabajo
+  fechaFinalizacion  DateTime? // trabajo completado
+  fechaCancelacion   DateTime? // cancelada por cliente/admin
+  fechaActualizacion DateTime  @updatedAt
+
+  motivoCancelacion String?
+
+  historialEstados HistorialEstadoSolicitud[]
+
+  @@index([clienteId])
+  @@index([tecnicoId])
+  @@index([estado])
 }
