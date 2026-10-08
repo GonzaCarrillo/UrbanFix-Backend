@@ -135,7 +135,7 @@ export const updateSolicitud = async (id, clienteId, data) => {
   });
 };
 
-export const cambiarEstado = async ({ id, user, estadoEsperado, nuevoEstado, datosActualizar = {}, motivo = null }) => {
+export const cambiarEstado = async ({ id, user, estadoEsperado, nuevoEstado, datosActualizar = {}, motivo = null, accion = 'cambiar el estado' }) => {
   return await prisma.$transaction(async (tx) => {
     const solicitud = await tx.solicitud.findUnique({ where: { id } });
     if (!solicitud) {
@@ -147,7 +147,7 @@ export const cambiarEstado = async ({ id, user, estadoEsperado, nuevoEstado, dat
 
     const estadosValidos = Array.isArray(estadoEsperado) ? estadoEsperado : [estadoEsperado];
     if (!estadosValidos.includes(solicitud.estado)) {
-      const error = new Error(`No se puede realizar la acción desde el estado ${solicitud.estado}`);
+      const error = new Error(`No se puede ${accion} una solicitud en estado ${solicitud.estado}`);
       error.status = 409;
       error.code = 'CONFLICT';
       throw error;

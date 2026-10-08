@@ -12,6 +12,17 @@ enum Rol {
   ADMIN
 }
 
+enum CategoriaServicio {
+  PLOMERIA
+  ELECTRICIDAD
+  GAS
+  CARPINTERIA
+  PINTURA
+  CERRAJERIA
+  ALBANILERIA
+  OTRO
+}
+
 enum EstadoSolicitud {
   PENDIENTE // Creada por el cliente, esperando asignación/respuesta
   ACEPTADA // Técnico aceptó el trabajo
