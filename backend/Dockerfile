@@ -9,7 +9,7 @@ COPY package*.json ./
 RUN npm ci
 
 COPY prisma ./prisma
-COPY prisma.config.ts ./
+COPY prisma.config.js ./
 
 # generate no se conecta a la base, pero el config exige que la variable exista
 RUN DATABASE_URL="postgresql://x:x@localhost:5432/x" npx prisma generate
@@ -18,5 +18,5 @@ COPY src ./src
 
 EXPOSE 3001
 
-# Aplica las migraciones pendientes y arranca la API
-CMD ["sh", "-c", "npx prisma migrate deploy && node src/index.js"]
+# Aplica las migraciones, siembra datos de prueba (idempotente) y arranca la API
+CMD ["sh", "-c", "npx prisma migrate deploy && node prisma/seed.js && node src/index.js"]
