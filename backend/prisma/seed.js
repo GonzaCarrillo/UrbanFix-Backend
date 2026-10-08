@@ -1,12 +1,14 @@
-import { PrismaClient } from '@prisma/client';
+import 'dotenv/config';
 import bcrypt from 'bcryptjs';
 import prisma from '../src/config/prisma.js'; // Importa la instancia configurada
 
+const PASSWORD = 'MinimoOchoCaracteres';
+
 async function main() {
-  const passwordHash = await bcrypt.hash('MinimoOchoCaracteres', 10);
+  const passwordHash = await bcrypt.hash(PASSWORD, 10);
 
   const cliente = await prisma.usuario.upsert({
-    where: { email: 'juan@mail.coms' },
+    where: { email: 'juan@mail.com' },
     update: {},
     create: {
       id: 'a1111111-1111-1111-1111-111111111111',
@@ -27,6 +29,19 @@ async function main() {
       nombre: 'Carlos Gómez',
       celular: '3884987654',
       rol: 'TECNICO',
+      passwordHash,
+    },
+  });
+
+  const admin = await prisma.usuario.upsert({
+    where: { email: 'admin@mail.com' },
+    update: {},
+    create: {
+      id: 'c3333333-3333-3333-3333-333333333333',
+      email: 'admin@mail.com',
+      nombre: 'Ana Admin',
+      celular: '3881111111',
+      rol: 'ADMIN',
       passwordHash,
     },
   });
@@ -53,6 +68,10 @@ async function main() {
   });
 
   console.log('Seed ejecutado correctamente.');
+  console.log(`Clientes/técnicos de prueba (password: ${PASSWORD}):`);
+  console.log(`  - ${cliente.email} (${cliente.rol})`);
+  console.log(`  - ${tecnico.email} (${tecnico.rol})`);
+  console.log(`  - ${admin.email} (${admin.rol})`);
 }
 
 main()

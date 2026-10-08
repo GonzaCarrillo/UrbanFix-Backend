@@ -1,6 +1,5 @@
 datasource db {
   provider = "postgresql"
- 
 }
 
 generator client {
@@ -11,6 +10,17 @@ enum Rol {
   CLIENTE
   TECNICO
   ADMIN
+}
+
+enum CategoriaServicio {
+  PLOMERIA
+  ELECTRICIDAD
+  GAS
+  CARPINTERIA
+  PINTURA
+  CERRAJERIA
+  ALBANILERIA
+  OTRO
 }
 
 enum EstadoSolicitud {
@@ -33,15 +43,16 @@ model Usuario {
   fechaActualizacion DateTime  @updatedAt
 
   // Relaciones
-  solicitudesComoCliente SolicitudServicio[] @relation("SolicitudesComoCliente")
-  solicitudesComoTecnico SolicitudServicio[] @relation("SolicitudesComoTecnico")
+  solicitudesComoCliente Solicitud[]       @relation("SolicitudesComoCliente")
+  solicitudesComoTecnico Solicitud[]       @relation("SolicitudesComoTecnico")
+  historialesCreados     HistorialEstado[] @relation("HistorialCambiadoPor")
 }
 
-model SolicitudServicio {
+model Solicitud {
   id                 String          @id @default(uuid())
   titulo             String
   descripcion        String
-  categoria          String          // Ej: Plomería, Electricidad, Gas
+  categoria          CategoriaServicio // PLOMERIA, ELECTRICIDAD, GAS, ...
   direccion          String
   estado             EstadoSolicitud @default(PENDIENTE)
 
@@ -49,8 +60,39 @@ model SolicitudServicio {
   cliente            Usuario         @relation("SolicitudesComoCliente", fields: [clienteId], references: [id])
 
   tecnicoId          String?
-  tecnico            Usuario?        @relation("SolicitudesComoTecnico", fields: [tecnicoId], references: [id])
+  tecnico            Usuario?        @relation("SolicitudesComoTecnico", fields: [tecnicoId], references: [id], onDelete: SetNull)
 
+  // Ciclo de vida
   fechaCreacion      DateTime        @default(now())
+  fechaAceptacion    DateTime?
+  fechaInicio        DateTime?
+  fechaFinalizacion  DateTime?
+  fechaCancelacion   DateTime?
+  motivoCancelacion  String?
   fechaActualizacion DateTime        @updatedAt
+
+  historial          HistorialEstado[]
+
+  @@map("SolicitudServicio")
+  @@index([clienteId])
+  @@index([tecnicoId])
+  @@index([estado])
+}
+
+model HistorialEstado {
+  id             String          @id @default(uuid())
+  solicitudId    String
+  solicitud      Solicitud       @relation(fields: [solicitudId], references: [id], onDelete: Cascade)
+
+  estadoAnterior EstadoSolicitud?
+  estadoNuevo    EstadoSolicitud
+
+  cambiadoPorId  String
+  cambiadoPor    Usuario         @relation("HistorialCambiadoPor", fields: [cambiadoPorId], references: [id])
+
+  motivo         String?
+  fechaCambio    DateTime        @default(now())
+
+  @@map("HistorialEstadoSolicitud")
+  @@index([solicitudId])
 }

@@ -2,14 +2,19 @@ import { Router } from 'express';
 import * as ctrl from '../controllers/solicitud.controller.js';
 import { authenticate, authorize } from '../middlewares/auth.middleware.js';
 import { validate } from '../middlewares/validate.middleware.js';
-import { createSolicitudSchema, updateSolicitudSchema, motivoSchema } from '../schemas/solicitud.schema.js';
+import {
+  createSolicitudSchema,
+  updateSolicitudSchema,
+  motivoSchema,
+  listSolicitudesQuerySchema
+} from '../schemas/solicitud.schema.js';
 
 const router = Router();
 
 router.use(authenticate);
 
 router.post('/', authorize(['CLIENTE']), validate(createSolicitudSchema), ctrl.create);
-router.get('/', ctrl.list);
+router.get('/', validate(listSolicitudesQuerySchema, 'query'), ctrl.list);
 router.get('/:id', ctrl.getById);
 router.patch('/:id', authorize(['CLIENTE']), validate(updateSolicitudSchema), ctrl.update);
 router.get('/:id/historial', ctrl.getHistorial);

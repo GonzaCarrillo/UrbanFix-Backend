@@ -6,3 +6,6 @@ backend/node_modules/
 backend/.env
 documentacion
 UrbanFix-Solutions-Brief.pdf
+
+# Scripts locales de prueba (no deben subirse)
+scripts/

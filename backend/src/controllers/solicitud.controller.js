@@ -35,6 +35,7 @@ export const aceptar = async (req, res, next) => {
       user: req.user,
       estadoEsperado: 'PENDIENTE',
       nuevoEstado: 'ACEPTADA',
+      accion: 'aceptar',
       datosActualizar: { tecnicoId: req.user.id, fechaAceptacion: new Date() }
     });
     res.status(200).json({ data: solicitud });
@@ -48,7 +49,8 @@ export const rechazar = async (req, res, next) => {
       user: req.user,
       estadoEsperado: 'PENDIENTE',
       nuevoEstado: 'RECHAZADA',
-      motivo: req.body.motivo
+      motivo: req.body.motivo,
+      accion: 'rechazar'
     });
     res.status(200).json({ data: solicitud });
   } catch (err) { next(err); }
@@ -65,6 +67,7 @@ export const iniciar = async (req, res, next) => {
       user: req.user,
       estadoEsperado: 'ACEPTADA',
       nuevoEstado: 'EN_PROCESO',
+      accion: 'iniciar',
       datosActualizar: { fechaInicio: new Date() }
     });
     res.status(200).json({ data: solicitud });
@@ -82,6 +85,7 @@ export const finalizar = async (req, res, next) => {
       user: req.user,
       estadoEsperado: 'EN_PROCESO',
       nuevoEstado: 'FINALIZADA',
+      accion: 'finalizar',
       datosActualizar: { fechaFinalizacion: new Date() }
     });
     res.status(200).json({ data: solicitud });
@@ -99,6 +103,7 @@ export const cancelar = async (req, res, next) => {
       user: req.user,
       estadoEsperado: ['PENDIENTE', 'ACEPTADA'],
       nuevoEstado: 'CANCELADA',
+      accion: 'cancelar',
       datosActualizar: { fechaCancelacion: new Date(), motivoCancelacion: req.body.motivo },
       motivo: req.body.motivo
     });
