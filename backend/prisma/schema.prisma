@@ -48,15 +48,6 @@ model Usuario {
   cambiosDeEstado        HistorialEstadoSolicitud[] @relation("CambiosDeEstado")
 }
 
-enum CategoriaServicio {
-  PLOMERIA
-  CARPINTERIA
-  PINTURA
-  CERRAJERIA
-  ALBANILERIA
-  OTRO
-}
-
 model HistorialEstadoSolicitud {
   id String @id @default(uuid())
 
