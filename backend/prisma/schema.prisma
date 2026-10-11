@@ -39,6 +39,7 @@ model Usuario {
   nombre             String
   celular            String? // opcional
   rol                Rol      @default(CLIENTE)
+  lastLogin          DateTime? //ultimo login exitoso; null = nunca inicio sesion
   fechaCreacion      DateTime @default(now())
   fechaActualizacion DateTime @updatedAt
 
@@ -46,15 +47,6 @@ model Usuario {
   solicitudesComoCliente SolicitudServicio[]        @relation("SolicitudesComoCliente")
   solicitudesComoTecnico SolicitudServicio[]        @relation("SolicitudesComoTecnico")
   cambiosDeEstado        HistorialEstadoSolicitud[] @relation("CambiosDeEstado")
-}
-
-enum CategoriaServicio {
-  PLOMERIA
-  CARPINTERIA
-  PINTURA
-  CERRAJERIA
-  ALBANILERIA
-  OTRO
 }
 
 model HistorialEstadoSolicitud {
